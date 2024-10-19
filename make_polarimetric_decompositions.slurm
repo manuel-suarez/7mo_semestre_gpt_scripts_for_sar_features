@@ -7,7 +7,7 @@
 
 fname=$1
 gpt=~/tools/esa-snap8.0/bin/gpt
-source=dataset-sentinel
+source=~/data/dataset-sentinel
 prod=SLC
 temp=temp1
 
