@@ -9,7 +9,7 @@ base_path=$1
 prod=SLC
 fname=$3
 temp=$4
-gpt=~/tools/esa-snap8.0/bin/gpt
+gpt=~/tools/esa-snap10.0/bin/gpt
 
 set -x #echo on
 set -e #stop on error
