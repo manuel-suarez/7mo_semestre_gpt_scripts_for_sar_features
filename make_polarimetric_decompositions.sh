@@ -65,10 +65,14 @@ if ! test -f $base_path/$temp/$name/pol_10.dim; then
   $gpt scripts/polarimetric_10.xml -SsourceProduct=$base_path/$temp/$name/pol_09.dim -t $base_path/$temp/$name/pol_10.dim
 fi
 # Land mask
-if ! test -f $base_path/$temp/$name/pol_11.dim; then
-  $gpt scripts/polarimetric_11.xml -SsourceProduct=$base_path/$temp/$name/pol_10.dim -t $base_path/$temp/$name/pol_11.dim
-fi
+#if ! test -f $base_path/$temp/$name/pol_11.dim; then
+#  $gpt scripts/polarimetric_11.xml -SsourceProduct=$base_path/$temp/$name/pol_10.dim -t $base_path/$temp/$name/pol_11.dim
+#fi
 # $gpt scripts/sar_export_to_tif.xml -SsourceProduct=dataset-sentinel/temp/$NAME.dim -t dataset-sentinel/GRD_tif/$NAME.tif
+# Copy to siimon5 ssh fuse mounted point
+mkdir -p ~/data/siimon5-shared/POL
+mv $base_path/$temp/$name/pol_10.data ~/data/siimon5-shared/POL/${name}.data
+mv $base_path/$temp/$name/pol_10.dim ~/data/siimon5-shared/POL/${name}.dim
 # Remove temporary files 01-09
 #
 for step in 01 02 03 04 05 06 07 08 09
