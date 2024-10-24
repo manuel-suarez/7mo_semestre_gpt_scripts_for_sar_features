@@ -15,6 +15,7 @@ if [ ! -d $base_path/$source/$name.SAFE ]; then
   unzip -qo $base_path/$source/$fname -d $base_path/$source/
 fi
 mkdir -p $base_path/$temp/$name
+mkdir -p $base_path/$dest/$name
 # Apply orbit file
 if ! test -f $base_path/$temp/$name/glm_01.dim; then
   $gpt scripts/glm-gen_01.xml -SsourceProduct=$base_path/$source/$name.SAFE -t $base_path/$temp/$name/glm_01.dim
@@ -40,14 +41,5 @@ if ! test -f $base_path/$temp/$name/glm_06.dim; then
   $gpt scripts/glm-gen_06.xml -SsourceProduct=$base_path/$temp/$name/glm_05.dim -t $base_path/$temp/$name/glm_06.dim
 fi
 # $gpt scripts/sar_export_to_tif.xml -SsourceProduct=dataset-sentinel/temp/$NAME.dim -t dataset-sentinel/GRD_tif/$NAME.tif
-# Remove temporary files 01-05
-#
-for step in 01 02 03 04 05
-do
-  if test -d $base_path/$temp/$name/glm_${step}.data; then
-    rm -rf $base_path/$temp/$name/glm_${step}.data
-  fi
-  if test -f $base_path/$temp/$name/glm_${step}.dim; then
-    rm $base_path/$temp/$name/glm_${step}.dim
-  fi
-done
+mv $base_path/$temp/$name/glm_06.data $base_path/$dest/$name/glm_06.data
+mv $base_path/$temp/$name/glm_06.dim $base_path/$dest/$name/glm_06.dim
