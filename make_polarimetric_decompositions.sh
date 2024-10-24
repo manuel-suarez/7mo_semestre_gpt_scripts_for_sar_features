@@ -7,7 +7,7 @@ temp=$4
 fname=$5
 
 name=${fname%%.*}
-echo $name
+echo "Processing $name in slurm script"
 
 # Apply orbit file
 set -x
@@ -16,6 +16,7 @@ if [ ! -d $base_path/$source/$name.SAFE ]; then
   unzip -qo $base_path/$source/$fname -d $base_path/$source/
 fi
 mkdir -p $base_path/$temp/$name
+mkdir -p $base_path/$dest/$name
 if ! test -f $base_path/$temp/$name/pol_01.dim; then
   $gpt scripts/polarimetric_01.xml -SsourceProduct=$base_path/$source/$name.SAFE -t $base_path/$temp/$name/pol_01.dim
 fi
@@ -69,30 +70,6 @@ fi
 #  $gpt scripts/polarimetric_11.xml -SsourceProduct=$base_path/$temp/$name/pol_10.dim -t $base_path/$temp/$name/pol_11.dim
 #fi
 # $gpt scripts/sar_export_to_tif.xml -SsourceProduct=dataset-sentinel/temp/$NAME.dim -t dataset-sentinel/GRD_tif/$NAME.tif
-# Copy to siimon5 ssh fuse mounted point
-mkdir -p ~/data/siimon5-shared/POL
-mv $base_path/$temp/$name/pol_10.data ~/data/siimon5-shared/POL/${name}.data
-mv $base_path/$temp/$name/pol_10.dim ~/data/siimon5-shared/POL/${name}.dim
-# Remove temporary files 01-09
-#
-for step in 01 02 03 04 05 06 07 08 09
-do
-  if [[ $step == "02" || $step == "03" || $step == "04" ]]; then
-    for n in 1 2 3
-    do
-      if test -d $base_path/$temp/$name/pol_${step}_iw${n}.data; then
-        rm -rf $base_path/$temp/$name/pol_${step}_iw${n}.data
-      fi
-      if test -f $base_path/$temp/$name/pol_${step}_iw${n}.dim; then
-        rm $base_path/$temp/$name/pol_${step}_iw${n}.dim
-      fi
-    done
-  else
-    if test -d $base_path/$temp/$name/pol_${step}.data; then
-      rm -rf $base_path/$temp/$name/pol_${step}.data
-    fi
-    if test -f $base_path/$temp/$name/pol_${step}.dim; then
-      rm $base_path/$temp/$name/pol_${step}.dim
-    fi
-  fi
-done
+# We need to wait until pol_10.dim has been created and move to destination folder to allow main script to delete temporary products
+mv $base_path/$temp/$name/pol_10.data $base_path/$dest/$name/pol_10.data
+mv $base_path/$temp/$name/pol_10.dim $base_path/$dest/$name/pol_10.dim
