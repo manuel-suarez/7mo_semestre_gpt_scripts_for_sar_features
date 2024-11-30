@@ -60,5 +60,9 @@ for fname in $(ls -1 $base_path/$source); do
       fi
     fi
   done
+  # Remove unziped product
+  if test -d $base_path/$source/$name.SAFE; then
+    rm -rf $base_path/$source/$name.SAFE
+  fi
   # Proceed with next file
 done
