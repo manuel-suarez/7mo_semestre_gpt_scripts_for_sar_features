@@ -17,29 +17,29 @@ fi
 mkdir -p $base_path/$temp/$name
 mkdir -p $base_path/$dest/$name
 # Apply orbit file
-if ! test -f $base_path/$temp/$name/glm_01.dim; then
-  $gpt scripts/glm-gen_01.xml -SsourceProduct=$base_path/$source/$name.SAFE -t $base_path/$temp/$name/glm_01.dim
+if ! test -f $base_path/$temp/$name/tiff_01.dim; then
+  $gpt scripts/tiff_01.xml -SsourceProduct=$base_path/$source/$name.SAFE -t $base_path/$temp/$name/tiff_01.dim
 fi
 # Calibration
-if ! test -f $base_path/$temp/$name/glm_02.dim; then
-  $gpt scripts/glm-gen_02.xml -SsourceProduct=$base_path/$temp/$name/glm_01.dim -t $base_path/$temp/$name/glm_02.dim
+if ! test -f $base_path/$temp/$name/tiff_02.dim; then
+  $gpt scripts/tiff_02.xml -SsourceProduct=$base_path/$temp/$name/tiff_01.dim -t $base_path/$temp/$name/tiff_02.dim
 fi
-# Speckle filter (Lee)
-if ! test -f $base_path/$temp/$name/glm_03.dim; then
-  $gpt scripts/glm-gen_03.xml -SsourceProduct=$base_path/$temp/$name/glm_02.dim -t $base_path/$temp/$name/glm_03.dim
+# Multilook
+if ! test -f $base_path/$temp/$name/tiff_03.dim; then
+  $gpt scripts/tiff_03.xml -SsourceProduct=$base_path/$temp/$name/tiff_02.dim -t $base_path/$temp/$name/tiff_03.dim
 fi
 # Ellipsoid correction
-if ! test -f $base_path/$temp/$name/glm_04.dim; then
-  $gpt scripts/glm-gen_04.xml -SsourceProduct=$base_path/$temp/$name/glm_03.dim -t $base_path/$temp/$name/glm_04.dim
+if ! test -f $base_path/$temp/$name/tiff_04.dim; then
+  $gpt scripts/tiff_04.xml -SsourceProduct=$base_path/$temp/$name/tiff_03.dim -t $base_path/$temp/$name/tiff_04.dim
 fi
-# Linear conversion
-if ! test -f $base_path/$temp/$name/glm_05.dim; then
-  $gpt scripts/glm-gen_05.xml -SsourceProduct=$base_path/$temp/$name/glm_04.dim -t $base_path/$temp/$name/glm_05.dim
+# Linear conversion of VV band
+if ! test -f $base_path/$temp/$name/${name}_VV.tif; then
+  $gpt scripts/tiff_05.xml -SsourceProduct=$base_path/$temp/$name/tiff_04.dim -SsourceBand=Sigma0_VV -t $base_path/$temp/$name/${name}_VV.tif
 fi
-# GLCM matrix generation
-if ! test -f $base_path/$temp/$name/glm_06.dim; then
-  $gpt scripts/glm-gen_06.xml -SsourceProduct=$base_path/$temp/$name/glm_05.dim -t $base_path/$temp/$name/glm_06.dim
+# Linear conversion of VH band
+if ! test -f $base_path/$temp/$name/${name}_VH.tif; then
+  $gpt scripts/tiff_05.xml -SsourceProduct=$base_path/$temp/$name/tiff_04.dim -SsourceBand=Sigma0_VH -t $base_path/$temp/$name/${name}_VH.tif
 fi
 # $gpt scripts/sar_export_to_tif.xml -SsourceProduct=dataset-sentinel/temp/$NAME.dim -t dataset-sentinel/GRD_tif/$NAME.tif
-mv $base_path/$temp/$name/glm_06.data $base_path/$dest/$name/glm_06.data
-mv $base_path/$temp/$name/glm_06.dim $base_path/$dest/$name/glm_06.dim
+mv $base_path/$temp/$name/${name}_VV.tif $base_path/$dest/$name/${name}_VV.tif
+mv $base_path/$temp/$name/${name}_VH.tif $base_path/$dest/$name/${name}_VH.tif
