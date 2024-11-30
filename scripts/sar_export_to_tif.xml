@@ -6,7 +6,8 @@
        <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
+      <!--Sigma0_VH-->
+      <sourceBands>${sourceBand}</sourceBands>
     </parameters>
   </node>
 </graph>
