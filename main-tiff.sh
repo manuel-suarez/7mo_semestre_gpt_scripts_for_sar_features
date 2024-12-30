@@ -16,6 +16,8 @@ set -e
 for fname in $(ls -1 $base_path/$source); do
   name=${fname%%.*}
   echo "Processing $name in bash script"
+  # Transfer product from siimon5 GRD product directory
+  # TODO
   # Unzip product and make temp directory
   if [ ! -d $base_path/$source/$name.SAFE ]; then
     unzip -qo $base_path/$source/$fname -d $base_path/$source/
@@ -53,5 +55,7 @@ for fname in $(ls -1 $base_path/$source); do
   if test -d $base_path/$source/$name.SAFE; then
     rm -rf $base_path/$source/$name.SAFE
   fi
+  # Remove product file
+  # TODO
   # Proceed with next file
 done
