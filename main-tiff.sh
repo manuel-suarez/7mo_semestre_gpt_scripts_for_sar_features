@@ -13,11 +13,13 @@ dest=TIFF
 temp=temp3
 set -x
 set -e
-for fname in $(ls -1 $base_path/$source); do
+# Download list of files to process
+scp -P 2235 manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/dataset-noaa/sentinel1/${source}_list.txt $base_path/${source}_list.txt
+for fname in $(cat GRD_list.txt); do
   name=${fname%%.*}
   echo "Processing $name in bash script"
   # Transfer product from siimon5 GRD product directory
-  # TODO
+  scp -P 2235 manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/dataset-noaa/sentinel1/$source/$fname $base_path/$source/$fname
   # Unzip product and make temp directory
   if [ ! -d $base_path/$source/$name.SAFE ]; then
     unzip -qo $base_path/$source/$fname -d $base_path/$source/
@@ -38,8 +40,8 @@ for fname in $(ls -1 $base_path/$source); do
   echo "$base_path/$dest/$name created, proceeding to move to siimon5"
   sleep 5m
   # Once that result is created we move it to siimon5
-  scp -P 2235 $base_path/$dest/$name/${name}_VV.tif manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/ssh_sharedir/TIFF/${name}_VV.tif
-  scp -r -P 2235 $base_path/$dest/$name/${name}_VH.tif manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/ssh_sharedir/TIFF/${name}_VH.tif
+  scp -P 2235 $base_path/$dest/$name/${name}_VV.tif manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/dataset-noaa/sentinel1/TIFF/${name}_VV.tif
+  scp -r -P 2235 $base_path/$dest/$name/${name}_VH.tif manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/dataset-noaa/sentinel1/TIFF/${name}_VH.tif
   # Remove temporary files 01-05
   #
   for step in 01 02 03 04 05
@@ -51,11 +53,17 @@ for fname in $(ls -1 $base_path/$source); do
       rm $base_path/$temp/$name/tiff_${step}.dim
     fi
   done
+  # Remove tiff files
+  if test -d $base_path/$dest/$name; then
+    rm -rf $base_path/$dest/$name
+  fi
   # Remove unziped product
   if test -d $base_path/$source/$name.SAFE; then
     rm -rf $base_path/$source/$name.SAFE
   fi
   # Remove product file
-  # TODO
+  if test -f $base_path/$source/$fname; then
+    rm $base_path/$source/$fname
+  fi
   # Proceed with next file
 done
