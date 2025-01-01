@@ -54,6 +54,10 @@ for fname in $(cat $base_path/${source}_list${num}.txt); do
       rm $base_path/$temp/$name/tiff_${step}.dim
     fi
   done
+  # Remove temp files
+  if test -d $base_path/$temp/$name; then
+    rm -rf $base_path/$temp/$name;
+  fi
   # Remove tiff files
   if test -d $base_path/$dest/$name; then
     rm -rf $base_path/$dest/$name
