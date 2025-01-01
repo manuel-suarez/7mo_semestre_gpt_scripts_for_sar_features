@@ -15,7 +15,7 @@ set -x
 set -e
 # Download list of files to process
 scp -P 2235 manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/dataset-noaa/sentinel1/${source}_list.txt $base_path/${source}_list.txt
-for fname in $(cat GRD_list.txt); do
+for fname in $(cat $base_path/${source}_list.txt); do
   name=${fname%%.*}
   echo "Processing $name in bash script"
   # Transfer product from siimon5 GRD product directory
