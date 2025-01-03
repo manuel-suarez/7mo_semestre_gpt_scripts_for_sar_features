@@ -42,7 +42,7 @@ for fname in $(cat $base_path/${source}_list${num}.txt); do
   sleep 5m
   # Once that result is created we move it to siimon5
   scp -P 2235 $base_path/$dest/$name/${name}_VV.tif manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-noaa/sentinel1/TIFF/${name}_VV.tif
-  scp -r -P 2235 $base_path/$dest/$name/${name}_VH.tif manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-noaa/sentinel1/TIFF/${name}_VH.tif
+  #scp -r -P 2235 $base_path/$dest/$name/${name}_VH.tif manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-noaa/sentinel1/TIFF/${name}_VH.tif
   # Remove temporary files 01-05
   #
   for step in 01 02 03 04 05
