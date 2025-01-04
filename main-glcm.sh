@@ -7,15 +7,23 @@
 
 # Variable configurations
 gpt=~/tools/esa-snap10.0/bin/gpt
-base_path=~/data/cimat/dataset-sentinel
-source=GRD
-dest=GLCM
+dataset=cimat
+base_path=~/data/cimat/dataset-$dataset
+source=products
+dest=texture
 temp=temp2
 set -x
 set -e
-for fname in $(ls -1 $base_path/$source); do
+mkdir -p $base_path/$source
+mkdir -p $base_path/$dest
+mkdir -p $base_path/$temp
+# Download list of files to process
+scp -P 2235 manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-${dataset}/${source}_list${num}.txt $base_path/${source}_list${num}.txt
+for fname in $(cat $base_path/${source}_list${num}.txt); do
   name=${fname%%.*}
   echo "Processing $name in bash script"
+  # Transfer product from siimon5 GRD product directory
+  scp -P 2235 manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-${dataset}/$source/$fname $base_path/$source/$fname
   # Unzip product and make temp directory
   if [ ! -d $base_path/$source/$name.SAFE ]; then
     unzip -qo $base_path/$source/$fname -d $base_path/$source/
@@ -25,22 +33,24 @@ for fname in $(ls -1 $base_path/$source); do
   if [ ! -f $base_path/$temp/$name/pol_01.dim ]; then
     $gpt scripts/glm-gen_01.xml -SsourceProduct=$base_path/$source/$name.SAFE -t $base_path/$temp/$name/glm_01.dim
   fi
-  # Run slurm polarimetric decompositions script (on C0 cpu nodes)
+  # Run slurm texture features script (on C0 cpu nodes)
   sbatch run-glcm.slurm $fname
   # Move result to siimon5 (we are implementing an active waiting using sleep)
-  while [ ! -f $base_path/$dest/$name/glm_06.dim ]; do
+  # There are ten features to be generated, we are waiting for the last
+  while [ ! -f $base_path/$dest/$name/${name}_GLCMCorrelation.tif ]; do
     # Sleep
-    echo "$base_path/$dest/$name result not created, waiting 30m..."
+    echo "$base_path/$dest/$name texture features not created, waiting 30m..."
     sleep 30m
   done
-  echo "$base_path/$dest/$name created, proceeding to move to siimon5"
+  echo "$base_path/$dest/$name texture features created, proceeding to move to siimon5"
   sleep 2m
   # Once that result is created we move it to siimon5
-  scp -P 2235 $base_path/$dest/$name/glm_06.dim manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/ssh_sharedir/GLCM/$name.dim
-  scp -r -P 2235 $base_path/$dest/$name/glm_06.data manuelsuarez@siimon5.cimat.mx:/home/mariocanul/image_storage/ssh_sharedir/GLCM/$name.data
-  # Remove temporary files 01-10
+  for feature in Contrast Dissimilarity Homogeinity ASM Energy MAX Entropy GLCMMean GLCMVariance GLCMCorrelation; do
+    scp -P 2235 $base_path/$dest/$name/${name}_${feature}.tif manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-${dataset}/$dest/${name}_${feature}.tif
+  done
+  # Remove temporary files 01-06
   #
-  for step in 01 02 03 04 05
+  for step in 01 02 03 04 05 06
   do
     if test -d $base_path/$temp/$name/glm_${step}.data; then
       rm -rf $base_path/$temp/$name/glm_${step}.data
@@ -52,6 +62,10 @@ for fname in $(ls -1 $base_path/$source); do
   # Remove unziped product
   if test -d $base_path/$source/$name.SAFE; then
     rm -rf $base_path/$source/$name.SAFE
+  fi
+  # Remove original product
+  if test -f $base_path/$source/$fname; then
+    rm $base_path/$source/$fname
   fi
   # Proceed with next file
 done

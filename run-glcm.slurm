@@ -5,4 +5,4 @@
 #SBATCH --time=0
 #SBATCH --mem=0
 
-srun bash make_texture_matrices.sh ~/data/cimat/dataset-sentinel GRD GLCM temp2 $1
+srun bash make_texture_matrices.sh ~/data/cimat/dataset-cimat products texture temp2 $1
