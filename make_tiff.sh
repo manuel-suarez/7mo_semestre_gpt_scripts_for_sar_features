@@ -38,8 +38,7 @@ if ! test -f $base_path/$temp/$name/${name}_VV.tif; then
 fi
 # Linear conversion of VH band
 #if ! test -f $base_path/$temp/$name/${name}_VH.tif; then
-#  $gpt scripts/tiff_05.xml -SsourceProduct=$base_path/$temp/$name/tiff_04.dim -PsourceBand=Sigma0_VH -t $base_path/$temp/$name/${name}_VH.tif
-#fi
+#  $gpt scripts/tiff_05.xml -SsourceProduct=$base_path/$temp/$name/tiff_04.dim -PsourceBand=Sigma0_VH -t $base_path/$temp/$name/${name}$feature.tif
 # $gpt scripts/sar_export_to_tif.xml -SsourceProduct=dataset-sentinel/temp/$NAME.dim -t dataset-sentinel/GRD_tif/$NAME.tif
 mv $base_path/$temp/$name/${name}_VV.tif $base_path/$dest/$name/${name}_VV.tif
 #mv $base_path/$temp/$name/${name}_VH.tif $base_path/$dest/$name/${name}_VH.tif
