@@ -8,17 +8,27 @@ fname=$5
 
 name=${fname%%.*}
 echo $name
+ext=${fname##*.}
+echo $ext
 
 set -x
 set -e
-if [ ! -d $base_path/$source/$name.SAFE ]; then
-  unzip -qo $base_path/$source/$fname -d $base_path/$source/
+
+# Unzip if is a sentinel product (zip extension)
+if [ $ext == "zip" ]; then
+  if [ ! -d $base_path/$source/$name.SAFE ]; then
+    unzip -qo $base_path/$source/$fname -d $base_path/$source/
+  fi
 fi
 mkdir -p $base_path/$temp/$name
-mkdir -p $base_path/$dest/$name
 # Apply orbit file
 if ! test -f $base_path/$temp/$name/tiff_01.dim; then
-  $gpt scripts/tiff_01.xml -SsourceProduct=$base_path/$source/$name.SAFE -t $base_path/$temp/$name/tiff_01.dim
+  # If product is ENVISAT ASAR (N1 extension) apply operator on product
+  if [ $ext == "N1" ]; then
+    $gpt scripts/tiff_01.xml -SsourceProduct=$base_path/$source/$fname -t $base_path/$temp/$name/tiff_01.dim
+  else
+    $gpt scripts/tiff_01.xml -SsourceProduct=$base_path/$source/$name.SAFE -t $base_path/$temp/$name/tiff_01.dim
+  fi
 fi
 # Calibration
 if ! test -f $base_path/$temp/$name/tiff_02.dim; then
@@ -33,12 +43,16 @@ if ! test -f $base_path/$temp/$name/tiff_04.dim; then
   $gpt scripts/tiff_04.xml -SsourceProduct=$base_path/$temp/$name/tiff_03.dim -t $base_path/$temp/$name/tiff_04.dim
 fi
 # Linear conversion of VV band
-if ! test -f $base_path/$temp/$name/${name}_VV.tif; then
-  $gpt scripts/tiff_05.xml -SsourceProduct=$base_path/$temp/$name/tiff_04.dim -PsourceBand=Sigma0_VV -t $base_path/$temp/$name/${name}_VV.tif
+if ! test -f $base_path/$temp/$name/tiff_05.dim; then
+  $gpt scripts/tiff_05.xml -SsourceProduct=$base_path/$temp/$name/tiff_04.dim -PsourceBand=Sigma0_VV -t $base_path/$temp/$name/tiff_05.dim
+fi
+# Write to output file
+if ! test -f $base_path/$temp/$name.tif; then
+  $gpt scripts/tiff_06.xml -SsourceProduct=$base_path/$temp/$name/tiff_05.dim -PoutputFile=$base_path/$temp/$name.tif
 fi
 # Linear conversion of VH band
 #if ! test -f $base_path/$temp/$name/${name}_VH.tif; then
 #  $gpt scripts/tiff_05.xml -SsourceProduct=$base_path/$temp/$name/tiff_04.dim -PsourceBand=Sigma0_VH -t $base_path/$temp/$name/${name}$feature.tif
 # $gpt scripts/sar_export_to_tif.xml -SsourceProduct=dataset-sentinel/temp/$NAME.dim -t dataset-sentinel/GRD_tif/$NAME.tif
-mv $base_path/$temp/$name/${name}_VV.tif $base_path/$dest/$name/${name}_VV.tif
+mv $base_path/$temp/$name.tif $base_path/$dest/$name.tif
 #mv $base_path/$temp/$name/${name}_VH.tif $base_path/$dest/$name/${name}_VH.tif
