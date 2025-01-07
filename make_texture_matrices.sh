@@ -56,10 +56,8 @@ for feature in Contrast Dissimilarity Homogeneity ASM Energy MAX Entropy GLCMMea
   if ! test -f $base_path/$temp/$name/$feature.tif; then
     # Extract individual feature band
     $gpt scripts/glm-gen_07.xml -SsourceProduct=$base_path/$temp/$name/glm_06.dim -PsourceBand=Sigma0_VV_db_${feature} -PoutputFile=$base_path/$temp/$name/$feature.tif
+    # Move to destination folder
+    mv $base_path/$temp/$name/$feature.tif $base_path/$dest/$name/$feature.tif
   fi
 done
 # $gpt scripts/sar_export_to_tif.xml -SsourceProduct=dataset-sentinel/temp/$NAME.dim -t dataset-sentinel/GRD_tif/$NAME.tif
-# Move to destination folder
-for feature in Contrast Dissimilarity Homogeneity ASM Energy MAX Entropy GLCMMean GLCMVariance GLCMCorrelation; do
-  mv $base_path/$temp/$name/$feature.tif $base_path/$dest/$name/${name}_${feature}.tif
-done
