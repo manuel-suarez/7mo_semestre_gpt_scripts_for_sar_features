@@ -10,4 +10,27 @@
       <sourceBands>${sourceBand}</sourceBands>
     </parameters>
   </node>
+  <node id="BandMaths">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="LinearToFromdB"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>${sourceBand}_valid</name>
+          <type>float32</type>
+          <expression>if (isInvalid(${sourceBand})) then -9999 else ${sourceBand}</expression>
+          <noDataValue>-9999</noDataValue>
+        </targetBand>
+      </targetBands>
+    </parameters>
+  </node>
+  <node id="Write">
+    <operator>Write</operator>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>${outputFile}</file>
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
 </graph>
