@@ -36,7 +36,12 @@ if ! test -f $base_path/$temp/$name/tiff_02.dim; then
 fi
 # Multilook
 if ! test -f $base_path/$temp/$name/tiff_03.dim; then
-  $gpt scripts/tiff_03.xml -SsourceProduct=$base_path/$temp/$name/tiff_02.dim -t $base_path/$temp/$name/tiff_03.dim
+  # If product is ENVISAT the looks parameter is 1, if sentinel, 2
+  if [ $ext == "N1" ]; then
+    $gpt scripts/tiff_03.xml -SsourceProduct=$base_path/$temp/$name/tiff_02.dim -Plooks=1 -t $base_path/$temp/$name/tiff_03.dim
+  else
+    $gpt scripts/tiff_03.xml -SsourceProduct=$base_path/$temp/$name/tiff_02.dim -Plooks=2 -t $base_path/$temp/$name/tiff_03.dim
+  fi
 fi
 # Ellipsoid correction
 if ! test -f $base_path/$temp/$name/tiff_04.dim; then

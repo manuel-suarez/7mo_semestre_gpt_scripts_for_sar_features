@@ -7,8 +7,8 @@
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
-      <nRgLooks>2</nRgLooks>
-      <nAzLooks>2</nAzLooks>
+      <nRgLooks>${looks}</nRgLooks>
+      <nAzLooks>${looks}</nAzLooks>
       <outputIntensity>true</outputIntensity>
       <grSquarePixel>true</grSquarePixel>
     </parameters>
