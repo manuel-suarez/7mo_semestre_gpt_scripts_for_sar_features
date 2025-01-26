@@ -17,6 +17,7 @@ set -x
 set -e
 mkdir -p $base_path/$source
 mkdir -p $base_path/$temp
+mkdir -p $base_path/$dest
 # Download list of files to process
 scp -P 2235 manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-${dataset}/${source}_list${num}.txt $base_path/${source}_list${num}.txt
 for fname in $(cat $base_path/${source}_list${num}.txt); do
