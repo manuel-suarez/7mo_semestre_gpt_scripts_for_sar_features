@@ -4,7 +4,6 @@
     <operator>Remove-GRD-Border-Noise</operator>
     <sources>
       <sourceProduct>${sourceProduct}</sourceProduct>
-      <sourceProduct refid="Apply-Orbit-File"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <selectedPolarisations>VV</selectedPolarisations>
