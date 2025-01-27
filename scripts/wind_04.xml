@@ -6,7 +6,7 @@
       <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands>Intensity_VV</sourceBands>
+      <sourceBands>${intensity}</sourceBands>
       <landMask>true</landMask>
       <useSRTM>true</useSRTM>
       <geometry/>

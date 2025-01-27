@@ -39,11 +39,19 @@ if ! test -f $base_path/$temp/$name/wind_02.dim; then
 fi
 # Remove GRD Border Noise
 if ! test -f $base_path/$temp/$name/wind_03.dim; then
-  $gpt scripts/wind_03.xml -SsourceProduct=$base_path/$temp/$name/wind_02.dim -t $base_path/$temp/$name/wind_03.dim
+  # Only if input is Sentinel-1
+  if [ $ext == "zip" ]; then
+    $gpt scripts/wind_03.xml -SsourceProduct=$base_path/$temp/$name/wind_02.dim -t $base_path/$temp/$name/wind_03.dim
+  fi
 fi
 # Land-Sea mask
 if ! test -f $base_path/$temp/$name/wind_04.dim; then
-  $gpt scripts/wind_04.xml -SsourceProduct=$base_path/$temp/$name/wind_03.dim -t $base_path/$temp/$name/wind_04.dim
+  # Due that the last step is only applied on Sentinel, we need to separate conditions
+  if [ $ext == "N1" ]; then
+    $gpt scripts/wind_04.xml -SsourceProduct=$base_path/$temp/$name/wind_02.dim -Pintensity=Intensity -t $base_path/$temp/$name/wind_04.dim
+  else
+    $gpt scripts/wind_04.xml -SsourceProduct=$base_path/$temp/$name/wind_03.dim -Pintensity=Intensity_VV -t $base_path/$temp/$name/wind_04.dim
+  fi
 fi
 # Calibration
 if ! test -f $base_path/$temp/$name/wind_05.dim; then
