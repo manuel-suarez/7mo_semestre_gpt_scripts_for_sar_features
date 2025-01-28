@@ -45,8 +45,9 @@ wind_gdf = gpd.read_file(wind_output_file)
 # Extract wind field points and values
 print("Get speed and coordinates values")
 points = gpd.GeoSeries.from_wkt(wind_gdf["geometry"])
-points = np.array([(geom.x, geom.y) for geom in points])
-speed_values = wind_gdf["speed"].values
+points_values = np.array([(geom.x, geom.y) for geom in points])
+speed_values = wind_gdf["speed"].values.astype(np.float32)
+print("speed_values datatype: ", speed_values.shape, speed_values.dtype)
 
 # Create interpolation grid (for SAR image)
 print("Create interpolation grid")
@@ -59,14 +60,21 @@ grid_points = np.column_stack([lon.flatten(), lat.flatten()])
 
 # Interpolate wind field values onto the SAR grid
 print("Interpolate wind data")
-interpolated_wind = griddata(
-    points, speed_values, grid_points, method="linear", fill_value=0
+wind_raster = rasterize(
+    zip(points, speed_values),
+    out_shape=(sar_shape[1], sar_shape[0]),
+    transform=sar_transform,
+    fill=0,
 )
-interpolated_wind = interpolated_wind.reshape(sar_shape)
+print(
+    "wind raster result: ",
+    wind_raster.shape,
+    wind_raster.dtype,
+    np.min(wind_raster),
+    np.max(wind_raster),
+)
 
 # Save wind field image
 print("Save windfield output image")
-imsave(
-    os.path.join(prod_path, fname + "_wind.png"), interpolated_wind.astype(np.float32)
-)
+imsave(os.path.join(prod_path, fname + "_wind.tif"), wind_raster)
 print("Done!")
