@@ -57,17 +57,6 @@ fi
 if ! test -f $base_path/$temp/$name/wind_05.dim; then
   $gpt scripts/wind_05.xml -SsourceProduct=$base_path/$temp/$name/wind_04.dim -t $base_path/$temp/$name/wind_05.dim
 fi
+
+# We end the wind field first script because the wind step estimatio needs internet access
 # Wind-field estimation
-if ! test -f $base_path/$temp/$name/wind_06.dim; then
-  $gpt scripts/wind_06.xml -SsourceProduct=$base_path/$temp/$name/wind_05.dim -t $base_path/$temp/$name/wind_06.dim
-fi
-# Terrain correction
-if ! test -f $base_path/$temp/$name/wind_07.dim; then
-  $gpt scripts/wind_07.xml -SsourceProduct=$base_path/$temp/$name/wind_06.dim -t $base_path/$temp/$name/wind_07.dim
-fi
-# Write to output file
-if ! test -f $base_path/$temp/$name.tif; then
-  $gpt scripts/wind_08.xml -SsourceProduct=$base_path/$temp/$name/wind_07.dim -PoutputFile=$base_path/$temp/$name.tif
-fi
-# Copy wind tiff result to destionation directory
-mv $base_path/$temp/$name.tif $base_path/$dest/$name.tif

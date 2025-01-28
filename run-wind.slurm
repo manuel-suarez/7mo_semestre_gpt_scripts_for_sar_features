@@ -10,5 +10,6 @@ source=$2
 dest=$3
 temp=$4
 fname=$5
+script=$6
 
-srun bash make_wind.sh $base_path $source $dest $temp $fname
+srun bash make_wind_${script}.sh $base_path $source $dest $temp $fname

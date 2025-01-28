@@ -50,16 +50,40 @@ for fname in $(cat $base_path/${source}_list${num}.txt); do
       $gpt scripts/wind_02.xml -SsourceProduct=$base_path/$temp/$name/wind_01.dim -t $base_path/$temp/$name/wind_02.dim
     fi
   fi
-  # Run slurm wind band extraction script (on C0 cpu nodes)
-  sbatch run-wind.slurm $base_path $source $dest $temp $fname
-  # Move result to siimon5 (we are implementing an active waiting using sleep)
-  while [ ! -f $base_path/$dest/${name}.tif ]; do
+  # Due the windfield estimation step internet requirement we need to do that step in this script
+  # and after that run the remaining steps of the second script
+
+  # Run slurm preprocessing steps (step 1-5) script (on C0 cpu nodes)
+  sbatch run-wind.slurm $base_path $source $dest $temp $fname 01
+  # Wait until step 5 is finished
+  while [ ! -f $base_path/$temp/$name/wind_05.dim ]; do
     # Sleep
-    echo "$base_path/$dest/$name result not created, waiting 30m..."
-    sleep 30m
+    echo "$base_path/$temp/$name/wind_05 result has not been created, waiting 2m..."
+    sleep 2m
   done
-  echo "$base_path/$dest/$name created, proceeding to move to siimon5"
+  echo "$base_path/$temp/$name/wind_05 result has been created, wait 5m and continue processing..."
+  # We wait for if the GPT pipeline has not been finished
   sleep 5m
+  # Run windfield estimation (step 6)
+  if ! test -f $base_path/$temp/$name/wind_06.dim; then
+    $gpt scripts/wind_06.xml -SsourceProduct=$base_path/$temp/$name/wind_05.dim -t $base_path/$temp/$name/wind_06.dim
+  fi
+  #
+  # Run slurm postprocessing steps (step 7) script (on C0 cpu nodes)
+  sbatch run-wind.slurm $base_path $source $dest $temp $fname 02
+  # Wait until step 7 is finished
+  while [ ! -f $base_path/$temp/$name/wind_07.dim ]; do
+    # Sleep
+    echo "$base_path/$temp/$name/wind_07 result has not been created, waiting 2m..."
+    sleep 2m
+  done
+  echo "$base_path/$temp/$name/wind_07 result has been created, wait 5m and continue processing..."
+  # We wait for if the GPT pipeline has not been finished
+  sleep 5m
+  # There is no extract vector data (SHP) on GPT pipeline so we need to read the CSV directly on the BEAM
+  # data and processing with Geopandas and Rasterio to interpolate to Wind Field Image
+  srun 
+  # Move result to siimon5 (we are implementing an active waiting using sleep)
   # Once that result is created we move it to siimon5
   scp -P 2235 $base_path/$dest/${name}.tif manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-${dataset}/$dest/${name}.tif
   #scp -r -P 2235 $base_path/$dest/$name/${name}_VH.tif manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-noaa/sentinel1/wind/${name}_VH.tif
