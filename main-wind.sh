@@ -86,7 +86,7 @@ for fname in $(cat $base_path/${source}_list${num}.txt); do
   #
   # Transfer original TIFF image to get dimensions for interpolation
   scp -P 2235 manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-${dataset}/$tiff/$name.tif $base_path/$temp/$name.tif
-  srun 
+  srun python read-wind-csv.py
   # Move result to siimon5 (we are implementing an active waiting using sleep)
   # Once that result is created we move it to siimon5
   scp -P 2235 $base_path/$dest/${name}.tif manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-${dataset}/$dest/${name}.tif
