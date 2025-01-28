@@ -10,6 +10,7 @@ gpt=~/tools/esa-snap10.0/bin/gpt
 dataset=cimat
 base_path=~/data/cimat/dataset-$dataset
 source=products
+tiff=tiff
 dest=wind
 temp=temp4
 num=$1
@@ -82,6 +83,9 @@ for fname in $(cat $base_path/${source}_list${num}.txt); do
   sleep 5m
   # There is no extract vector data (SHP) on GPT pipeline so we need to read the CSV directly on the BEAM
   # data and processing with Geopandas and Rasterio to interpolate to Wind Field Image
+  #
+  # Transfer original TIFF image to get dimensions for interpolation
+  scp -P 2235 manuelsuarez@siimon5.cimat.mx:~/data/cimat/dataset-${dataset}/$tiff/$name.tif $base_path/$temp/$name.tif
   srun 
   # Move result to siimon5 (we are implementing an active waiting using sleep)
   # Once that result is created we move it to siimon5
