@@ -69,13 +69,13 @@ for geom, speed, heading in zip(geometry, speed_values, heading_values):
     # Create OGR point feature
     ogr_feature = ogr.Feature(layer.GetLayerDefn())
     point = ogr.Geometry(ogr.wkbPoint)
-    point.AddPoint(geom.getLon(), geom.getLat())
+    point.AddPoint(geom.x, geom.y)
 
     ogr_feature.SetGeometry(point)
 
     # Set attribute values
-    ogr_feature.SetField("speed", speed)
-    ogr_feature.SetField("heading", heading)
+    ogr_feature.SetField("speed", str(speed))
+    ogr_feature.SetField("heading", str(heading))
 
     layer.CreateFeature(ogr_feature)
 
