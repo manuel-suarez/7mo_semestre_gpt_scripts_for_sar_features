@@ -9,10 +9,6 @@ from rasterio.features import rasterize
 from scipy.interpolate import griddata
 from matplotlib import pyplot as plt
 
-# Add SNAPPY installation path
-sys.path.append("/home/est_posgrado_manuel.suarez/.snap/snap-python")
-import esa_snappy
-from esa_snappy import ProductIO, ProductUtils, GPF, HashMap
 from osgeo import ogr, osr
 
 fname = "ASA_IMP_1PNESA20050425_075225_000000182036_00393_16479_0000"
@@ -21,43 +17,36 @@ base_path = os.path.expanduser("~")
 data_path = os.path.join(base_path, "data", "cimat", "dataset-cimat", "temp4")
 prod_path = os.path.join(data_path, fname)
 
+# Wind field vector data
+wind_path = os.path.join(prod_path, "wind_07.data", "vector_data")
+wind_input_file = os.path.join(wind_path, "WindField.csv")
+wind_output_file = os.path.join(wind_path, "WindField_2.csv")
+
 # Input and output file paths
-input_beamfile = os.path.join(prod_path, "wind_07.dim")
 output_shapefile = os.path.join(prod_path, "WindField_Point.shp")
 
-# Load BEAM-DIMAP product...
-print("Loading BEAM-DIMAP file...")
-product = ProductIO.readProduct(input_beamfile)
-if product is None:
-    print("Error: could not load product.")
-    exit(1)
+# Open file to remove # characters and :Datatype marks
+print("Open WindField CSV")
+with open(wind_input_file, "r") as input_file, open(
+    wind_output_file, "w"
+) as output_file:
+    for index, line in enumerate(input_file):
+        if line.startswith("#"):
+            continue
+        if index == 3:
+            line = (
+                line.replace(":String", "").replace(":Double", "").replace(":Point", "")
+            )
+        output_file.write(line)
 
-# Extract vector data
-print("Extracting windfield data...")
-product_node = product.getVectorDataGroup()
-print(type(product_node))
-exit(1)
-if product_node is None:
-    print("No vector data group found.")
-    exit(1)
+# Open wind CSV file
+wind_gdf = gpd.read_file(wind_output_file)
 
-# Loop through the vector data nodes and extract features
-print(product_node.getNodeCount())
-
-vector_data_node = None
-for index in range(product_node.getNodeCount()):
-    node = product_node.get(index)
-    if node.getName() == "WindField":
-        vector_data_node = node
-        break
-if vector_data_node is None:
-    print("No VectorDataNodeProduct found.")
-    exit(1)
-
-print(f"Extracting vector data from: {vector_data_node.getName()}")
-print(type(vector_data_node))
-print(dir(vector_data_node))
-exit(0)
+# Extract wind field points and values
+print("Get speed and coordinates values")
+geometry = gpd.GeoSeries.from_wkt(wind_gdf["geometry"])
+speed_values = wind_gdf["speed"].values.astype(np.float32)
+heading_values = wind_gdf["heading"].values.astype(np.float32)
 
 # Prepare OGR for shapefile creation
 driver = ogr.GetDriverByName("ESRI Shapefile")
@@ -75,12 +64,7 @@ layer.CreateField(ogr.FieldDefn("speed", ogr.OFTReal))
 layer.CreateField(ogr.FieldDefn("heading", ogr.OFTReal))
 
 # Extract the features from the vector data node
-for feature in vector_data_node.getFeatureCollection():
-    geom = feature.getGeometry()
-    attrs = feature.getAttributes()
-
-    if geom is None:
-        continue  # Skip invalid geometries
+for geom, speed, heading in zip(geometry, speed_values, heading_values):
 
     # Create OGR point feature
     ogr_feature = ogr.Feature(layer.GetLayerDefn())
@@ -90,8 +74,8 @@ for feature in vector_data_node.getFeatureCollection():
     ogr_feature.SetGeometry(point)
 
     # Set attribute values
-    ogr_feature.SetField("speed", attrs.get("speed", 0.0))
-    ogr_feature.SetField("heading", attrs.get("heading", 0.0))
+    ogr_feature.SetField("speed", speed)
+    ogr_feature.SetField("heading", heading)
 
     layer.CreateFeature(ogr_feature)
 
