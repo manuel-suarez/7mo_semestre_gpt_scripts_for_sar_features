@@ -22,21 +22,21 @@ if [ $ext == "zip" ]; then
 fi
 mkdir -p $base_path/$temp/$name
 # Apply thermal noise removal (only if Sentinel)
-if ! test -f $base_path/$temp/$name/wind_01.dim; then
-  # Only for Sentinel-1 products
-  if [ $ext == "zip" ]; then
-    $gpt scripts/wind_01.xml -SsourceProduct=$base_path/$source/$fname -t $base_path/$temp/$name/wind_01.dim
-  fi
-fi
+#if ! test -f $base_path/$temp/$name/wind_01.dim; then
+#  # Only for Sentinel-1 products
+#  if [ $ext == "zip" ]; then
+#    $gpt scripts/wind_01.xml -SsourceProduct=$base_path/$source/$fname -t $base_path/$temp/$name/wind_01.dim
+#  fi
+#fi
 # Apply orbit file
-if ! test -f $base_path/$temp/$name/wind_02.dim; then
-  # If product is ENVISAT ASAR (N1 extension) apply operator on product
-  if [ $ext == "N1" ]; then
-    $gpt scripts/wind_02.xml -SsourceProduct=$base_path/$source/$fname -t $base_path/$temp/$name/wind_02.dim
-  else
-    $gpt scripts/wind_02.xml -SsourceProduct=$base_path/$temp/$name/wind_01.dim -t $base_path/$temp/$name/wind_02.dim
-  fi
-fi
+#if ! test -f $base_path/$temp/$name/wind_02.dim; then
+#  # If product is ENVISAT ASAR (N1 extension) apply operator on product
+#  if [ $ext == "N1" ]; then
+#    $gpt scripts/wind_02.xml -SsourceProduct=$base_path/$source/$fname -t $base_path/$temp/$name/wind_02.dim
+#  else
+#    $gpt scripts/wind_02.xml -SsourceProduct=$base_path/$temp/$name/wind_01.dim -t $base_path/$temp/$name/wind_02.dim
+#  fi
+#fi
 # Remove GRD Border Noise
 if ! test -f $base_path/$temp/$name/wind_03.dim; then
   # Only if input is Sentinel-1

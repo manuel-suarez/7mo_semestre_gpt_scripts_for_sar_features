@@ -1,6 +1,7 @@
 import os
 import sys
 import rasterio
+import argparse
 import numpy as np
 import geopandas as gpd
 
@@ -11,19 +12,25 @@ from matplotlib import pyplot as plt
 
 from osgeo import ogr, osr
 
-fname = "ASA_IMP_1PNESA20050425_075225_000000182036_00393_16479_0000"
+parser = argparse.ArgumentParser()
+parser.add_argument("--fname", type=str, required=True, help="product file name")
+args = parser.parse_args()
+print("Args: ", args)
+
+fname = args.fname
 
 base_path = os.path.expanduser("~")
-data_path = os.path.join(base_path, "data", "cimat", "dataset-cimat", "temp4")
-prod_path = os.path.join(data_path, fname)
+data_path = os.path.join(base_path, "data", "cimat", "dataset-tarso", "temp4", fname)
+output_path = os.path.join(base_path, "data", "cimat", "dataset-tarso", "wind", fname)
+# prod_path = os.path.join(data_path, fname)
 
 # Wind field vector data
-wind_path = os.path.join(prod_path, "wind_07.data", "vector_data")
+wind_path = os.path.join(data_path, "wind_07.data", "vector_data")
 wind_input_file = os.path.join(wind_path, "WindField.csv")
 wind_output_file = os.path.join(wind_path, "WindField_2.csv")
 
 # Input and output file paths
-output_shapefile = os.path.join(prod_path, "WindField_Point.shp")
+output_shapefile = os.path.join(output_path, "WindField_Point.shp")
 
 # Open file to remove # characters and :Datatype marks
 print("Open WindField CSV")
