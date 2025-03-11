@@ -6,7 +6,7 @@
       <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands>${band}</sourceBands>
+      <sourceBands>${bands}</sourceBands>
     </parameters>
   </node>
 </graph>
