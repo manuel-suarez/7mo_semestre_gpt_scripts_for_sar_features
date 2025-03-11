@@ -6,7 +6,6 @@
       <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <!-- Ensures all bands match B4 resolution (10 mts)--!>
       <referenceBand>B4</referenceBand>
     </parameters>
   </node>
