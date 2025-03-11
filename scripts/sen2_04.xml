@@ -1,12 +1,13 @@
 <graph id="Sentinel2_L2A_Export">
   <version>1.0</version>
-  <node id="Resample">
-    <operator>Resample</operator>
+  <node id="Write">
+    <operator>Write</operator>
     <sources>
       <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <referenceBand>B4</referenceBand>
+      <file>${outputFile}</file>
+      <formatName>GeoTIFF</formatName>
     </parameters>
   </node>
 </graph>
