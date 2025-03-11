@@ -21,7 +21,8 @@ fname = args.fname
 
 base_path = os.path.expanduser("~")
 data_path = os.path.join(base_path, "data", "cimat", "dataset-tarso", "temp4", fname)
-output_path = os.path.join(base_path, "data", "cimat", "dataset-tarso", "wind", fname)
+# output_path = os.path.join(base_path, "data", "cimat", "dataset-tarso", "wind", fname)
+# os.makedirs(output_path, exist_ok=True)
 # prod_path = os.path.join(data_path, fname)
 
 # Wind field vector data
@@ -30,24 +31,29 @@ wind_input_file = os.path.join(wind_path, "WindField.csv")
 wind_output_file = os.path.join(wind_path, "WindField_2.csv")
 
 # Input and output file paths
-output_shapefile = os.path.join(output_path, "WindField_Point.shp")
+output_shapefile = os.path.join(data_path, "WindField_Point.shp")
 
 # Open file to remove # characters and :Datatype marks
 print("Open WindField CSV")
+flag = False
 with open(wind_input_file, "r") as input_file, open(
     wind_output_file, "w"
 ) as output_file:
     for index, line in enumerate(input_file):
         if line.startswith("#"):
             continue
-        if index == 3:
+        if not flag:
             line = (
-                line.replace(":String", "").replace(":Double", "").replace(":Point", "")
+                line.replace("snap_geometry", "")
+                .replace(":String", "")
+                .replace(":Double", "")
+                .replace(":Point", "")
             )
+            flag = True
         output_file.write(line)
 
 # Open wind CSV file
-wind_gdf = gpd.read_file(wind_output_file)
+wind_gdf = gpd.read_file(wind_output_file, ignore_geometry=True)
 
 # Extract wind field points and values
 print("Get speed and coordinates values")
